@@ -114,7 +114,7 @@ export default function AddExpenseModal({
               )}
             </div>
             <div className="relative">
-              <span className="text-2xl font-bold text-slate-400 absolute left-3.5 top-2">$</span>
+              <span className="text-2xl font-bold text-slate-400 absolute left-3.5 top-2">₹</span>
               <input
                 type="number"
                 step="0.01"
@@ -123,20 +123,20 @@ export default function AddExpenseModal({
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 placeholder="0.00"
-                className="w-full pl-8 pr-4 py-2.5 text-2xl font-bold bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white tracking-tight"
+                className="w-full pl-9 pr-4 py-2.5 text-2xl font-bold bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white tracking-tight"
               />
             </div>
 
             {/* Quick amount chips */}
             <div className="flex gap-1.5 pt-1">
-              {[5, 10, 20, 50].map((val) => (
+              {[50, 100, 200, 500].map((val) => (
                 <button
                   key={val}
                   type="button"
                   onClick={() => setAmount(String((parseFloat(amount) || 0) + val))}
                   className="flex-1 py-1 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-600 dark:text-slate-300 transition"
                 >
-                  +{val}
+                  +₹{val}
                 </button>
               ))}
             </div>

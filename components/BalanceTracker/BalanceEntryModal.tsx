@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X, Calendar, DollarSign, ArrowDownRight, ArrowUpRight, Info } from "lucide-react";
+import { X, Calendar, ArrowDownRight, ArrowUpRight, Info } from "lucide-react";
 import { dataService } from "@/lib/storage";
 import { BalanceEntry } from "@/lib/types";
 import { formatCurrency, getDayName, getTodayDateString } from "@/lib/utils";
@@ -127,13 +127,13 @@ export default function BalanceEntryModal({
               )}
             </div>
             <div className="relative">
-              <DollarSign className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+              <span className="font-bold text-xs text-slate-400 absolute left-3.5 top-2.5">₹</span>
               <input
                 type="number"
                 step="0.01"
                 value={manualPrevBalance}
                 onChange={(e) => setManualPrevBalance(e.target.value)}
-                placeholder="e.g. 500.00"
+                placeholder="e.g. 5000.00"
                 className="w-full pl-9 pr-3 py-2 text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white font-medium"
               />
             </div>
@@ -145,7 +145,7 @@ export default function BalanceEntryModal({
               {dayName}&apos;s New Balance
             </label>
             <div className="relative">
-              <span className="text-xl font-bold text-slate-400 absolute left-3.5 top-2.5">$</span>
+              <span className="text-xl font-bold text-slate-400 absolute left-3.5 top-2.5">₹</span>
               <input
                 type="number"
                 step="0.01"
@@ -154,7 +154,7 @@ export default function BalanceEntryModal({
                 value={balance}
                 onChange={(e) => setBalance(e.target.value)}
                 placeholder="0.00"
-                className="w-full pl-8 pr-4 py-2.5 text-xl font-bold bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white tracking-tight"
+                className="w-full pl-9 pr-4 py-2.5 text-xl font-bold bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white tracking-tight"
               />
             </div>
           </div>

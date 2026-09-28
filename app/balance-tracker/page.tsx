@@ -226,7 +226,7 @@ export default function BalanceTrackerPage() {
                     Start Your Balance Tracker
                   </h3>
                   <p className="text-xs text-slate-500 mt-1 max-w-xs mx-auto leading-relaxed">
-                    First, log your starting balance (e.g. <strong>Sunday balance: $500</strong>). Next, enter Monday&apos;s balance (e.g. <strong>$420</strong>) and it will compute the $80 difference automatically!
+                    First, log your starting balance (e.g. <strong>Sunday balance: ₹5,000</strong>). Next, enter Monday&apos;s balance (e.g. <strong>₹4,200</strong>) and it will compute the ₹800 difference automatically!
                   </p>
                 </div>
                 <button
