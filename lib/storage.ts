@@ -205,6 +205,7 @@ export const dataService = {
         userId: row.user_id,
         balanceEntryId: row.balance_entry_id,
         category: row.category,
+        subcategory: row.subcategory || undefined,
         amount: Number(row.amount),
         description: row.description,
         isAutoSettled: row.is_auto_settled,
@@ -220,7 +221,8 @@ export const dataService = {
     balanceEntryId: string,
     category: string,
     amount: number,
-    description: string
+    description: string,
+    subcategory?: string
   ): Promise<ExpenseItem> {
     const userId = await this.getEffectiveUserId();
 
@@ -231,6 +233,7 @@ export const dataService = {
           user_id: userId,
           balance_entry_id: balanceEntryId,
           category,
+          subcategory: subcategory || "",
           amount,
           description: description || "",
           is_auto_settled: false,
@@ -245,6 +248,7 @@ export const dataService = {
         userId: data.user_id,
         balanceEntryId: data.balance_entry_id,
         category: data.category,
+        subcategory: data.subcategory || undefined,
         amount: Number(data.amount),
         description: data.description,
         isAutoSettled: data.is_auto_settled,
@@ -256,6 +260,7 @@ export const dataService = {
         userId,
         balanceEntryId,
         category,
+        subcategory: subcategory || undefined,
         amount,
         description: description || "",
         isAutoSettled: false,

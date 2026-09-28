@@ -2,9 +2,24 @@
 
 import { ExpenseItem, Category } from "@/lib/types";
 import { CATEGORIES, formatCurrency } from "@/lib/utils";
-import { Utensils, ShoppingCart, Car, Receipt, ShoppingBag, Film, HeartPulse, MoreHorizontal, Trash2, Sparkles } from "lucide-react";
+import { 
+  Utensils, 
+  ShoppingCart, 
+  Car, 
+  Receipt, 
+  ShoppingBag, 
+  Film, 
+  HeartPulse, 
+  MoreHorizontal, 
+  Trash2, 
+  Sparkles, 
+  CreditCard, 
+  Tag, 
+  ChevronRight 
+} from "lucide-react";
 
 const CATEGORY_ICONS: Record<string, any> = {
+  EMI: CreditCard,
   Food: Utensils,
   Groceries: ShoppingCart,
   Transport: Car,
@@ -41,8 +56,11 @@ export default function ExpenseList({
   return (
     <div className="space-y-2">
       {expenses.map((expense) => {
-        const Icon = CATEGORY_ICONS[expense.category] || MoreHorizontal;
-        const categoryMeta = CATEGORIES[expense.category as Category] || CATEGORIES.Others;
+        const Icon = CATEGORY_ICONS[expense.category] || Tag;
+        const categoryMeta = CATEGORIES[expense.category as Category] || {
+          color: "text-indigo-500",
+          bg: "bg-indigo-500/10 border-indigo-500/20",
+        };
 
         return (
           <div
@@ -60,10 +78,16 @@ export default function ExpenseList({
                 <Icon className={`w-5 h-5 ${categoryMeta.color}`} />
               </div>
               <div>
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1.5 flex-wrap">
                   <span className="font-semibold text-slate-900 dark:text-white text-sm">
                     {expense.category}
                   </span>
+                  {expense.subcategory && (
+                    <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-md bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold border border-indigo-500/20">
+                      <ChevronRight className="w-2.5 h-2.5" />
+                      {expense.subcategory}
+                    </span>
+                  )}
                   {expense.isAutoSettled && (
                     <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[10px] font-bold border border-amber-500/20">
                       <Sparkles className="w-2.5 h-2.5" />
