@@ -186,6 +186,7 @@ export default function BalanceTrackerPage() {
                 <ReconciliationCard
                   entry={selectedEntry}
                   expenses={expenses}
+                  allEntries={entries}
                   onAddExpenseClick={() => setExpenseModalOpen(true)}
                   onSettled={handleSettled}
                 />

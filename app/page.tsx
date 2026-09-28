@@ -7,7 +7,7 @@ import AuthModal from "@/components/AuthModal";
 import BalanceEntryModal from "@/components/BalanceTracker/BalanceEntryModal";
 import { dataService } from "@/lib/storage";
 import { BalanceEntry, UserProfile } from "@/lib/types";
-import { formatCurrency, getTodayDateString, getDayName } from "@/lib/utils";
+import { formatCurrency, getTodayDateString, getDayName, calculateDaysBetween, getPerDaySpend } from "@/lib/utils";
 import { 
   Wallet, 
   ArrowRight, 
@@ -19,7 +19,8 @@ import {
   Layers, 
   Bot, 
   FileText, 
-  Calendar 
+  Calendar,
+  Clock
 } from "lucide-react";
 import { isSupabaseConfigured } from "@/lib/supabase";
 
@@ -51,6 +52,12 @@ export default function HomePage() {
   }, []);
 
   const latestEntry = entries.length > 0 ? entries[0] : null;
+  const previousEntry = latestEntry ? entries.find((e) => e.date < latestEntry.date) : null;
+  const daysDiff = (latestEntry && previousEntry)
+    ? calculateDaysBetween(previousEntry.date, latestEntry.date)
+    : 1;
+  const perDaySpend = latestEntry ? getPerDaySpend(latestEntry.difference, daysDiff) : 0;
+
   const todayDate = getTodayDateString();
   const todayDayName = getDayName(todayDate);
   const hasLoggedToday = latestEntry?.date === todayDate;
@@ -130,13 +137,33 @@ export default function HomePage() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className="text-[11px] text-slate-500">Day Difference</span>
+                  <span className="text-[11px] text-slate-500">
+                    {daysDiff > 1 ? `Difference (${daysDiff} days)` : "Day Difference"}
+                  </span>
                   <div className="flex items-center justify-end gap-1 text-sm font-bold text-rose-500 mt-0.5">
                     <TrendingDown className="w-4 h-4" />
                     {formatCurrency(Math.abs(latestEntry.difference))}
                   </div>
+                  {latestEntry.difference !== 0 && (
+                    <div className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 mt-0.5">
+                      {formatCurrency(perDaySpend)}
+                      <span className="text-[10px] text-slate-400 font-normal"> / day</span>
+                    </div>
+                  )}
                 </div>
               </div>
+
+              {previousEntry && (
+                <div className="flex items-center justify-between px-3 py-1.5 rounded-xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/40 text-xs">
+                  <span className="text-slate-600 dark:text-slate-400 text-[11px] flex items-center gap-1.5 font-medium">
+                    <Clock className="w-3.5 h-3.5 text-indigo-500" />
+                    <span>{daysDiff} {daysDiff === 1 ? "day gap" : "days interval"} ({previousEntry.dayName.slice(0, 3)} → {latestEntry.dayName.slice(0, 3)})</span>
+                  </span>
+                  <span className="font-bold text-indigo-600 dark:text-indigo-400 text-[11px]">
+                    {formatCurrency(perDaySpend)} / day frequency
+                  </span>
+                </div>
+              )}
 
               <div className="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-slate-750 text-xs">
                 <span className="text-slate-500">Status</span>

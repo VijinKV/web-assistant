@@ -29,6 +29,20 @@ export function getTodayDateString(): string {
   return `${year}-${month}-${day}`;
 }
 
+export function calculateDaysBetween(startDateStr: string, endDateStr: string): number {
+  const [sy, sm, sd] = startDateStr.split("-").map(Number);
+  const [ey, em, ed] = endDateStr.split("-").map(Number);
+  const start = new Date(Date.UTC(sy, sm - 1, sd));
+  const end = new Date(Date.UTC(ey, em - 1, ed));
+  const diffTime = Math.abs(end.getTime() - start.getTime());
+  const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+  return Math.max(1, diffDays);
+}
+
+export function getPerDaySpend(difference: number, days: number): number {
+  return Math.abs(difference) / Math.max(1, days);
+}
+
 export const CATEGORIES: Record<Category, CategoryInfo> = {
   Food: {
     name: "Food",

@@ -1,7 +1,7 @@
 "use client";
 
 import { BalanceEntry } from "@/lib/types";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, calculateDaysBetween, getPerDaySpend } from "@/lib/utils";
 import { Calendar, CheckCircle2, Clock, ChevronRight, Trash2, ArrowDownRight, ArrowUpRight } from "lucide-react";
 
 interface HistoryViewProps {
@@ -35,6 +35,9 @@ export default function HistoryView({
         const isSelected = selectedEntryId === entry.id;
         const diff = entry.difference;
         const isOutflow = diff > 0;
+        const prevEntry = entries.find((e) => e.date < entry.date);
+        const days = prevEntry ? calculateDaysBetween(prevEntry.date, entry.date) : 1;
+        const perDay = getPerDaySpend(diff, days);
 
         return (
           <div
@@ -90,6 +93,11 @@ export default function HistoryView({
                       {formatCurrency(Math.abs(diff))}
                     </span>
                   </div>
+                  {diff !== 0 && (
+                    <div className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400">
+                      {formatCurrency(perDay)}/day {days > 1 ? `(${days}d)` : ""}
+                    </div>
+                  )}
                   <span
                     className={`inline-block text-[10px] font-semibold mt-0.5 ${
                       entry.isSettled ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400"

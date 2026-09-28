@@ -15,12 +15,13 @@ import {
   ShieldCheck
 } from "lucide-react";
 import { BalanceEntry, ExpenseItem } from "@/lib/types";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, calculateDaysBetween, getPerDaySpend } from "@/lib/utils";
 import { dataService } from "@/lib/storage";
 
 interface ReconciliationCardProps {
   entry: BalanceEntry;
   expenses: ExpenseItem[];
+  allEntries?: BalanceEntry[];
   onAddExpenseClick: () => void;
   onSettled: (updatedEntry: BalanceEntry, settledExpense?: ExpenseItem) => void;
 }
@@ -28,11 +29,17 @@ interface ReconciliationCardProps {
 export default function ReconciliationCard({
   entry,
   expenses,
+  allEntries,
   onAddExpenseClick,
   onSettled,
 }: ReconciliationCardProps) {
   const [settling, setSettling] = useState(false);
   const [confirmSettle, setConfirmSettle] = useState(false);
+
+  // Interval & Per-Day frequency
+  const previousEntry = allEntries ? allEntries.find((e) => e.date < entry.date) : null;
+  const daysDiff = (previousEntry && entry) ? calculateDaysBetween(previousEntry.date, entry.date) : 1;
+  const perDaySpend = getPerDaySpend(entry.difference, daysDiff);
 
   // Math
   const totalAccounted = expenses.reduce((acc, curr) => acc + curr.amount, 0);
@@ -136,6 +143,18 @@ export default function ReconciliationCard({
             {formatCurrency(Math.abs(diff))}
           </span>
         </div>
+
+        {isOutflow && previousEntry && (
+          <div className="mt-2 pt-2 border-t border-slate-200/60 dark:border-slate-800 flex items-center justify-between text-xs">
+            <span className="text-slate-500 text-[11px] flex items-center gap-1">
+              <Clock className="w-3 h-3 text-indigo-500" />
+              <span>{daysDiff} {daysDiff === 1 ? "day interval" : "days interval"} ({previousEntry.dayName.slice(0, 3)} → {entry.dayName.slice(0, 3)})</span>
+            </span>
+            <span className="font-bold text-indigo-600 dark:text-indigo-400 text-[11px]">
+              {formatCurrency(perDaySpend)} <span className="font-normal text-slate-400">/ day</span>
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Reconciliation Progress Bar */}
