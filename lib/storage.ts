@@ -5,8 +5,19 @@ import { getDayName } from "./utils";
 const LOCAL_BALANCES_KEY = "web_assistant_balances";
 const LOCAL_EXPENSES_KEY = "web_assistant_expenses";
 const LOCAL_USER_KEY = "web_assistant_user";
+const LOCAL_GUEST_ID_KEY = "web_assistant_guest_id";
 
-// Local storage mock helpers
+function getGuestId(): string {
+  if (typeof window === "undefined") return "guest_default";
+  let gid = localStorage.getItem(LOCAL_GUEST_ID_KEY);
+  if (!gid) {
+    gid = "guest_" + Math.random().toString(36).substring(2, 10);
+    localStorage.setItem(LOCAL_GUEST_ID_KEY, gid);
+  }
+  return gid;
+}
+
+// Local storage fallback helpers
 function getLocalBalances(): BalanceEntry[] {
   if (typeof window === "undefined") return [];
   const raw = localStorage.getItem(LOCAL_BALANCES_KEY);
@@ -44,31 +55,32 @@ export const dataService = {
     } else {
       if (typeof window === "undefined") return null;
       const raw = localStorage.getItem(LOCAL_USER_KEY);
-      if (!raw) {
-        // default demo user
-        const demoUser: UserProfile = {
-          id: "demo-user-123",
-          email: "demo@webassistant.app",
-          name: "Demo Account",
-        };
-        localStorage.setItem(LOCAL_USER_KEY, JSON.stringify(demoUser));
-        return demoUser;
-      }
+      if (!raw) return null;
       return JSON.parse(raw);
     }
   },
 
+  async getEffectiveUserId(): Promise<string> {
+    const user = await this.getUser();
+    return user?.id || getGuestId();
+  },
+
   // Get all balance entries sorted descending by date
   async getBalanceEntries(): Promise<BalanceEntry[]> {
+    const userId = await this.getEffectiveUserId();
+
     if (isSupabaseConfigured) {
       const { data, error } = await supabase
         .from("balance_entries")
         .select("*")
+        .eq("user_id", userId)
         .order("date", { ascending: false });
 
       if (error) {
-        console.error("Error fetching balance entries:", error);
-        return [];
+        console.error("Error fetching balance entries from Supabase:", error);
+        // Fallback to local storage on error
+        const list = getLocalBalances();
+        return list.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
       }
 
       return (data || []).map((row: any) => ({
@@ -97,15 +109,14 @@ export const dataService = {
     return older.length > 0 ? older[0] : null;
   },
 
-  // Record a new balance entry
+  // Record a new balance entry (auto-calculates difference from previous entry)
   async recordBalance(
     date: string,
     balance: number,
     manualPreviousBalance?: number | null,
     notes?: string
   ): Promise<BalanceEntry> {
-    const user = await this.getUser();
-    const userId = user?.id || "anonymous";
+    const userId = await this.getEffectiveUserId();
     const dayName = getDayName(date);
 
     // Determine previous balance: if not manually specified, find latest preceding entry
@@ -116,7 +127,7 @@ export const dataService = {
     }
 
     // Difference = previousBalance - currentBalance (how much spent)
-    // E.g. Sunday $500, Monday $420 => Difference = $80
+    // E.g. Sunday ₹5000, Monday ₹4200 => Difference = ₹800 spent
     const difference = prevBal !== null ? prevBal - balance : 0;
 
     if (isSupabaseConfigured) {
@@ -135,7 +146,10 @@ export const dataService = {
         .select()
         .single();
 
-      if (error) throw new Error(error.message);
+      if (error) {
+        console.error("Supabase insert error, falling back to local:", error);
+        throw new Error(error.message);
+      }
 
       return {
         id: data.id,
@@ -166,7 +180,6 @@ export const dataService = {
       };
 
       const existing = getLocalBalances();
-      // Replace if entry for same date exists, else append
       const filtered = existing.filter((b) => b.date !== date);
       setLocalBalances([newEntry, ...filtered]);
       return newEntry;
@@ -209,8 +222,7 @@ export const dataService = {
     amount: number,
     description: string
   ): Promise<ExpenseItem> {
-    const user = await this.getUser();
-    const userId = user?.id || "anonymous";
+    const userId = await this.getEffectiveUserId();
 
     if (isSupabaseConfigured) {
       const { data, error } = await supabase
@@ -272,8 +284,7 @@ export const dataService = {
     entry: BalanceEntry,
     currentExpenses: ExpenseItem[]
   ): Promise<{ settledExpense?: ExpenseItem; updatedEntry: BalanceEntry }> {
-    const user = await this.getUser();
-    const userId = user?.id || "anonymous";
+    const userId = await this.getEffectiveUserId();
 
     const totalAccounted = currentExpenses.reduce((sum, item) => sum + item.amount, 0);
     const remainingDifference = Math.max(0, entry.difference - totalAccounted);
