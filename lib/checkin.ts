@@ -1,5 +1,6 @@
 import { dataService } from "./storage";
 import { trackerService } from "./trackers";
+import { isSupabaseConfigured } from "./supabase";
 import { Tracker } from "./types";
 import { formatDateString, getDayName, getTodayDateString, shiftDateString } from "./utils";
 
@@ -61,6 +62,18 @@ export function dismissForSession(date: string) {
 
 export async function getCheckInStatus(now: Date = new Date()): Promise<CheckInStatus> {
   const { date: targetDate, isToday } = getCheckInTarget(now);
+
+  // With Supabase, data is per account: nothing to ask (or save) until signed in.
+  if (isSupabaseConfigured && !(await dataService.getUser())) {
+    return {
+      targetDate,
+      isToday,
+      label: getDayName(targetDate).slice(0, 3),
+      needsBalance: false,
+      pendingTrackers: [],
+      missedDays: 0,
+    };
+  }
 
   const [trackers, entries, recentLogs] = await Promise.all([
     trackerService.getTrackers(),

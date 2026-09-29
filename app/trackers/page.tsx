@@ -38,6 +38,8 @@ export default function TrackersPage() {
       ]);
       setTrackers(list);
       setLogs(recent);
+    } catch (err: any) {
+      setError(err.message || "Could not load trackers");
     } finally {
       setLoading(false);
     }
@@ -65,9 +67,8 @@ export default function TrackersPage() {
       setUnit("");
       await load();
     } catch (err: any) {
-      setError(
-        `${err.message || "Could not add tracker"} (run supabase/trackers.sql in Supabase if you have not yet)`
-      );
+      const msg: string = err.message || "Could not add tracker";
+      setError(msg.includes("sign in") ? msg : `${msg} (run supabase/trackers.sql in Supabase if you have not yet)`);
     }
   };
 

@@ -46,13 +46,14 @@ function mapLog(row: any): TrackerLog {
 
 export const trackerService = {
   async getTrackers(): Promise<Tracker[]> {
-    const userId = await dataService.getEffectiveUserId();
-
     if (isSupabaseConfigured) {
+      const user = await dataService.getUser();
+      if (!user) return [];
+
       const { data, error } = await supabase
         .from("trackers")
         .select("*")
-        .eq("user_id", userId)
+        .eq("user_id", user.id)
         .eq("is_active", true)
         .order("created_at", { ascending: true });
 
@@ -114,13 +115,14 @@ export const trackerService = {
 
   // All logs on/after sinceDate (YYYY-MM-DD), newest first
   async getLogs(sinceDate: string): Promise<TrackerLog[]> {
-    const userId = await dataService.getEffectiveUserId();
-
     if (isSupabaseConfigured) {
+      const user = await dataService.getUser();
+      if (!user) return [];
+
       const { data, error } = await supabase
         .from("tracker_logs")
         .select("*")
-        .eq("user_id", userId)
+        .eq("user_id", user.id)
         .gte("date", sinceDate)
         .order("date", { ascending: false });
 
