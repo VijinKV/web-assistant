@@ -36,14 +36,22 @@ ALTER TABLE public.expenses ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can manage their own balance entries"
     ON public.balance_entries
     FOR ALL
+    TO authenticated
     USING (auth.uid() = user_id)
     WITH CHECK (auth.uid() = user_id);
 
 CREATE POLICY "Users can manage their own expenses"
     ON public.expenses
     FOR ALL
+    TO authenticated
     USING (auth.uid() = user_id)
-    WITH CHECK (auth.uid() = user_id);
+    WITH CHECK (
+        auth.uid() = user_id
+        AND EXISTS (
+            SELECT 1 FROM public.balance_entries b
+            WHERE b.id = balance_entry_id AND b.user_id = auth.uid()
+        )
+    );
 
 -- 5. Indexes for fast mobile queries
 CREATE INDEX IF NOT EXISTS idx_balance_entries_user_date ON public.balance_entries(user_id, date DESC);
