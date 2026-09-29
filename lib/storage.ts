@@ -5,17 +5,7 @@ import { getDayName } from "./utils";
 const LOCAL_BALANCES_KEY = "web_assistant_balances";
 const LOCAL_EXPENSES_KEY = "web_assistant_expenses";
 const LOCAL_USER_KEY = "web_assistant_user";
-const LOCAL_GUEST_ID_KEY = "web_assistant_guest_id";
-
-function getGuestId(): string {
-  if (typeof window === "undefined") return "guest_default";
-  let gid = localStorage.getItem(LOCAL_GUEST_ID_KEY);
-  if (!gid) {
-    gid = "guest_" + Math.random().toString(36).substring(2, 10);
-    localStorage.setItem(LOCAL_GUEST_ID_KEY, gid);
-  }
-  return gid;
-}
+const LOCAL_DEMO_USER_ID = "local_demo";
 
 // Local storage fallback helpers
 function getLocalBalances(): BalanceEntry[] {
@@ -60,27 +50,30 @@ export const dataService = {
     }
   },
 
+  // Supabase data is only reachable when signed in (row level security uses auth.uid()).
+  // Local demo mode keeps everything in this browser, so it needs no account.
   async getEffectiveUserId(): Promise<string> {
     const user = await this.getUser();
-    return user?.id || getGuestId();
+    if (user) return user.id;
+    if (isSupabaseConfigured) throw new Error("Please sign in to save and view your data.");
+    return LOCAL_DEMO_USER_ID;
   },
 
   // Get all balance entries sorted descending by date
   async getBalanceEntries(): Promise<BalanceEntry[]> {
-    const userId = await this.getEffectiveUserId();
-
     if (isSupabaseConfigured) {
+      const user = await this.getUser();
+      if (!user) return [];
+
       const { data, error } = await supabase
         .from("balance_entries")
         .select("*")
-        .eq("user_id", userId)
+        .eq("user_id", user.id)
         .order("date", { ascending: false });
 
       if (error) {
         console.error("Error fetching balance entries from Supabase:", error);
-        // Fallback to local storage on error
-        const list = getLocalBalances();
-        return list.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        return [];
       }
 
       return (data || []).map((row: any) => ({
