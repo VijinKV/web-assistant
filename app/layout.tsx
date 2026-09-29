@@ -13,7 +13,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: "#4f46e5",
+  themeColor: "#fafafa",
 };
 
 export default function RootLayout({
@@ -23,9 +23,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-50 antialiased min-h-screen selection:bg-indigo-500 selection:text-white">
+      <body className="bg-zinc-100 dark:bg-black text-zinc-900 dark:text-zinc-50 antialiased min-h-screen selection:bg-zinc-900 selection:text-white dark:selection:bg-white dark:selection:text-zinc-900">
         {/* Mobile Viewport Container Shell */}
-        <div className="max-w-md mx-auto min-h-screen bg-slate-50 dark:bg-slate-900/90 shadow-2xl relative flex flex-col border-x border-slate-200/60 dark:border-slate-800">
+        <div className="max-w-md mx-auto min-h-screen bg-zinc-50 dark:bg-zinc-950 relative flex flex-col">
           <main className="flex-1 pb-24">{children}</main>
           <BottomNav />
         </div>

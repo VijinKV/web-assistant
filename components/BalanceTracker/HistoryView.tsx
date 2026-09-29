@@ -2,7 +2,7 @@
 
 import { BalanceEntry } from "@/lib/types";
 import { formatCurrency, calculateDaysBetween, getPerDaySpend } from "@/lib/utils";
-import { Calendar, CheckCircle2, Clock, ChevronRight, Trash2, ArrowDownRight, ArrowUpRight } from "lucide-react";
+import { Calendar, Trash2, ArrowDownRight, ArrowUpRight } from "lucide-react";
 
 interface HistoryViewProps {
   entries: BalanceEntry[];
@@ -19,18 +19,18 @@ export default function HistoryView({
 }: HistoryViewProps) {
   if (entries.length === 0) {
     return (
-      <div className="text-center py-10 px-4 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
-        <Calendar className="w-10 h-10 mx-auto text-slate-300 dark:text-slate-700 mb-2" />
-        <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200">No balance history yet</h4>
-        <p className="text-xs text-slate-400 mt-1 max-w-xs mx-auto">
-          Start by recording your starting balance (e.g. Sunday), then record the next day (Monday) to see the difference!
+      <div className="text-center py-12 px-6 rounded-2xl border border-dashed border-zinc-200 dark:border-zinc-800">
+        <Calendar className="w-6 h-6 mx-auto text-zinc-300 dark:text-zinc-600 mb-3" />
+        <h4 className="text-sm font-medium text-zinc-700 dark:text-zinc-200">No history yet</h4>
+        <p className="text-xs text-zinc-400 mt-1 max-w-xs mx-auto leading-relaxed">
+          Record a starting balance (e.g. Sunday), then the next day (Monday) to see the difference.
         </p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-2.5">
+    <div className="card p-0 divide-y divide-zinc-100 dark:divide-zinc-800 overflow-hidden">
       {entries.map((entry) => {
         const isSelected = selectedEntryId === entry.id;
         const diff = entry.difference;
@@ -43,68 +43,62 @@ export default function HistoryView({
           <div
             key={entry.id}
             onClick={() => onSelectEntry(entry)}
-            className={`p-4 rounded-2xl border transition-all cursor-pointer ${
+            className={`relative px-4 py-3.5 cursor-pointer transition-colors ${
               isSelected
-                ? "bg-indigo-50/70 dark:bg-indigo-950/40 border-indigo-400 dark:border-indigo-600 ring-2 ring-indigo-500/20 shadow-sm"
-                : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 shadow-sm"
+                ? "bg-zinc-50 dark:bg-zinc-800/60"
+                : "hover:bg-zinc-50/70 dark:hover:bg-zinc-800/30"
             }`}
           >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div
-                  className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-xs uppercase ${
-                    entry.isSettled
-                      ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
-                      : "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20"
-                  }`}
-                >
-                  {entry.dayName.slice(0, 3)}
+            {isSelected && (
+              <span className="absolute left-0 top-3 bottom-3 w-0.5 rounded-full bg-zinc-900 dark:bg-white" />
+            )}
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-9 text-center shrink-0">
+                  <div className="text-[10px] font-medium uppercase text-zinc-400">
+                    {entry.dayName.slice(0, 3)}
+                  </div>
+                  <div className="text-base font-semibold text-zinc-900 dark:text-white tabular-nums leading-tight">
+                    {entry.date.slice(8, 10)}
+                  </div>
                 </div>
 
-                <div>
+                <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-slate-900 dark:text-white text-sm">
-                      {entry.dayName}
+                    <span className="amount font-medium text-zinc-900 dark:text-white text-sm">
+                      {formatCurrency(entry.balance)}
                     </span>
-                    <span className="text-xs text-slate-400">({entry.date})</span>
+                    <span
+                      className={`w-1.5 h-1.5 rounded-full ${entry.isSettled ? "bg-emerald-500" : "bg-amber-500"}`}
+                      title={entry.isSettled ? "Settled" : "In Progress"}
+                    />
                   </div>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">
-                      Bal: {formatCurrency(entry.balance)}
-                    </span>
+                  <div className="text-[11px] text-zinc-400 mt-0.5 truncate">
+                    {entry.date}
                     {entry.previousBalance !== null && (
-                      <span className="text-[11px] text-slate-400">
-                        • Prev: {formatCurrency(entry.previousBalance)}
-                      </span>
+                      <> · Prev {formatCurrency(entry.previousBalance)}</>
                     )}
                   </div>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1 shrink-0">
                 <div className="text-right">
-                  <div className="flex items-center justify-end gap-1">
+                  <div className="flex items-center justify-end gap-0.5">
                     {isOutflow ? (
                       <ArrowDownRight className="w-3.5 h-3.5 text-rose-500" />
                     ) : (
                       <ArrowUpRight className="w-3.5 h-3.5 text-emerald-500" />
                     )}
-                    <span className="text-xs font-bold text-slate-900 dark:text-white">
+                    <span className="amount text-sm font-medium text-zinc-900 dark:text-white">
                       {formatCurrency(Math.abs(diff))}
                     </span>
                   </div>
                   {diff !== 0 && (
-                    <div className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400">
+                    <div className="amount text-[11px] text-zinc-400">
                       {formatCurrency(perDay)}/day {days > 1 ? `(${days}d)` : ""}
                     </div>
                   )}
-                  <span
-                    className={`inline-block text-[10px] font-semibold mt-0.5 ${
-                      entry.isSettled ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400"
-                    }`}
-                  >
-                    {entry.isSettled ? "Settled" : "In Progress"}
-                  </span>
                 </div>
 
                 <button
@@ -115,10 +109,10 @@ export default function HistoryView({
                       onDeleteEntry(entry.id);
                     }
                   }}
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 transition"
+                  className="icon-btn hover:text-rose-500"
                   title="Delete entry"
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className="w-3.5 h-3.5" />
                 </button>
               </div>
             </div>

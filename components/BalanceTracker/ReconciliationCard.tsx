@@ -3,16 +3,11 @@
 import { useState } from "react";
 import confetti from "canvas-confetti";
 import { 
-  ArrowRight, 
   CheckCircle2, 
   Plus, 
-  Sparkles, 
-  AlertCircle, 
   TrendingDown, 
   TrendingUp, 
-  Clock, 
-  ChevronRight,
-  ShieldCheck
+  Clock
 } from "lucide-react";
 import { BalanceEntry, ExpenseItem } from "@/lib/types";
 import { formatCurrency, calculateDaysBetween, getPerDaySpend } from "@/lib/utils";
@@ -56,7 +51,7 @@ export default function ReconciliationCard({
         particleCount: 80,
         spread: 70,
         origin: { y: 0.6 },
-        colors: ["#6366f1", "#10b981", "#f59e0b", "#8b5cf6"],
+        colors: ["#18181b", "#10b981", "#a1a1aa", "#f59e0b"],
       });
     } catch (e) {
       // ignore in environments without canvas
@@ -78,101 +73,93 @@ export default function ReconciliationCard({
   };
 
   return (
-    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm space-y-5">
+    <div className="card space-y-6">
       {/* Top Header: Day & Status */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-start justify-between">
         <div>
-          <span className="text-xs font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-            {entry.dayName} Reconciliation
-          </span>
-          <h2 className="text-lg font-bold text-slate-900 dark:text-white mt-0.5">
+          <p className="eyebrow">{entry.dayName}</p>
+          <h2 className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mt-1">
             {entry.date}
           </h2>
         </div>
-        <div>
-          {entry.isSettled ? (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              Settled
-            </span>
-          ) : (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-              <Clock className="w-3.5 h-3.5" />
-              Reconciling
-            </span>
-          )}
-        </div>
+        {entry.isSettled ? (
+          <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-600 dark:text-emerald-400">
+            <CheckCircle2 className="w-3.5 h-3.5" />
+            Settled
+          </span>
+        ) : (
+          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-amber-600 dark:text-amber-400">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+            Reconciling
+          </span>
+        )}
       </div>
 
-      {/* Balance Flow: Sunday -> Monday subtraction display */}
-      <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-800">
-        <div className="grid grid-cols-2 gap-4 items-center">
-          <div>
-            <span className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">
-              {entry.previousBalance !== null ? "Previous Balance" : "Starting"}
-            </span>
-            <p className="text-base font-bold text-slate-800 dark:text-slate-200 mt-0.5">
-              {entry.previousBalance !== null ? formatCurrency(entry.previousBalance) : "—"}
-            </p>
-          </div>
-
-          <div className="text-right">
-            <span className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">
-              {entry.dayName} Balance
-            </span>
-            <p className="text-base font-bold text-indigo-600 dark:text-indigo-400 mt-0.5">
-              {formatCurrency(entry.balance)}
-            </p>
-          </div>
-        </div>
-
-        <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-750 flex items-center justify-between">
-          <div className="flex items-center gap-1.5">
-            {isOutflow ? (
-              <TrendingDown className="w-4 h-4 text-rose-500" />
-            ) : isIncome ? (
-              <TrendingUp className="w-4 h-4 text-emerald-500" />
-            ) : (
-              <CheckCircle2 className="w-4 h-4 text-slate-400" />
-            )}
-            <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-              {isOutflow ? "Total Difference (Spent)" : isIncome ? "Balance Inflow" : "Balanced"}
-            </span>
-          </div>
-          <span className="text-sm font-extrabold text-slate-900 dark:text-white">
-            {formatCurrency(Math.abs(diff))}
-          </span>
-        </div>
-
+      {/* Headline difference */}
+      <div>
+        <p className="text-xs text-zinc-400 flex items-center gap-1">
+          {isOutflow ? (
+            <TrendingDown className="w-3.5 h-3.5 text-rose-500" />
+          ) : isIncome ? (
+            <TrendingUp className="w-3.5 h-3.5 text-emerald-500" />
+          ) : (
+            <CheckCircle2 className="w-3.5 h-3.5" />
+          )}
+          {isOutflow ? "Total difference (spent)" : isIncome ? "Balance inflow" : "Balanced"}
+        </p>
+        <p className="amount text-3xl font-semibold text-zinc-900 dark:text-white mt-1">
+          {formatCurrency(Math.abs(diff))}
+        </p>
         {isOutflow && previousEntry && (
-          <div className="mt-2 pt-2 border-t border-slate-200/60 dark:border-slate-800 flex items-center justify-between text-xs">
-            <span className="text-slate-500 text-[11px] flex items-center gap-1">
-              <Clock className="w-3 h-3 text-indigo-500" />
-              <span>{daysDiff} {daysDiff === 1 ? "day interval" : "days interval"} ({previousEntry.dayName.slice(0, 3)} → {entry.dayName.slice(0, 3)})</span>
-            </span>
-            <span className="font-bold text-indigo-600 dark:text-indigo-400 text-[11px]">
-              {formatCurrency(perDaySpend)} <span className="font-normal text-slate-400">/ day</span>
-            </span>
-          </div>
+          <p className="text-xs text-zinc-400 mt-1 flex items-center gap-1">
+            <Clock className="w-3 h-3" />
+            <span className="amount text-zinc-600 dark:text-zinc-300 font-medium">{formatCurrency(perDaySpend)}</span>
+            / day over {daysDiff} {daysDiff === 1 ? "day" : "days"} ({previousEntry.dayName.slice(0, 3)} → {entry.dayName.slice(0, 3)})
+          </p>
         )}
+      </div>
+
+      {/* Balance Flow: previous -> current */}
+      <div className="grid grid-cols-2 gap-4 pt-4 border-t border-zinc-100 dark:border-zinc-800">
+        <div>
+          <p className="eyebrow">
+            {entry.previousBalance !== null ? "Previous" : "Starting"}
+          </p>
+          <p className="amount text-sm font-medium text-zinc-700 dark:text-zinc-300 mt-1">
+            {entry.previousBalance !== null ? formatCurrency(entry.previousBalance) : "—"}
+          </p>
+        </div>
+        <div>
+          <p className="eyebrow">{entry.dayName}</p>
+          <p className="amount text-sm font-medium text-zinc-900 dark:text-white mt-1">
+            {formatCurrency(entry.balance)}
+          </p>
+        </div>
       </div>
 
       {/* Reconciliation Progress Bar */}
       {isOutflow && (
         <div className="space-y-2">
-          <div className="flex items-center justify-between text-xs font-semibold">
-            <span className="text-slate-600 dark:text-slate-400">
-              Accounted: <strong className="text-slate-900 dark:text-white">{formatCurrency(totalAccounted)}</strong>
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-zinc-400">
+              Accounted <span className="amount font-medium text-zinc-900 dark:text-white">{formatCurrency(totalAccounted)}</span>
             </span>
-            <span className={remainingDifference > 0 ? "text-amber-600 dark:text-amber-400" : "text-emerald-600 dark:text-emerald-400"}>
-              Remaining: <strong>{formatCurrency(remainingDifference)}</strong>
+            <span className="text-zinc-400">
+              Remaining{" "}
+              <span
+                className={`amount font-medium ${
+                  remainingDifference > 0 ? "text-amber-600 dark:text-amber-400" : "text-emerald-600 dark:text-emerald-400"
+                }`}
+              >
+                {formatCurrency(remainingDifference)}
+              </span>
             </span>
           </div>
 
-          <div className="w-full h-2.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+          <div className="w-full h-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
             <div
-              className={`h-full transition-all duration-500 ${
-                isFullyAccounted ? "bg-emerald-500" : "bg-gradient-to-r from-indigo-500 to-amber-500"
+              className={`h-full rounded-full transition-all duration-500 ${
+                isFullyAccounted ? "bg-emerald-500" : "bg-zinc-900 dark:bg-white"
               }`}
               style={{ width: `${progressPercent}%` }}
             />
@@ -180,73 +167,55 @@ export default function ReconciliationCard({
         </div>
       )}
 
-      {/* Settlement Callout if not settled yet */}
+      {/* Settlement actions if not settled yet */}
       {!entry.isSettled && isOutflow && (
-        <div className="p-3.5 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/50 space-y-3">
-          <div className="flex items-start gap-2.5">
-            <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0 mt-0.5" />
-            <div className="text-xs text-indigo-950 dark:text-indigo-200">
-              <p className="font-semibold">Ready to reconcile this day?</p>
-              <p className="text-[11px] opacity-80 mt-0.5">
-                Add known expenses like Food or Bills. If you can&apos;t recall the rest, tap <strong>Settle</strong> and the remaining {formatCurrency(remainingDifference)} will automatically transfer to &quot;Others&quot;.
-              </p>
-            </div>
-          </div>
-
+        <div className="space-y-3">
           {confirmSettle ? (
-            <div className="space-y-2 pt-1 border-t border-indigo-200/50 dark:border-indigo-800/40">
-              <p className="text-xs font-semibold text-indigo-900 dark:text-indigo-200">
-                Confirm settling remaining {formatCurrency(remainingDifference)} into &quot;Others&quot;?
+            <div className="panel p-4 space-y-3">
+              <p className="text-sm text-zinc-700 dark:text-zinc-200">
+                Move the remaining <span className="amount font-medium">{formatCurrency(remainingDifference)}</span> into &quot;Others&quot;?
               </p>
               <div className="flex gap-2">
                 <button
                   onClick={handleSettle}
                   disabled={settling}
-                  className="flex-1 py-2 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs transition shadow-sm"
+                  className="btn-primary flex-1 py-2 text-xs"
                 >
                   {settling ? "Settling..." : "Yes, Settle Now"}
                 </button>
                 <button
                   onClick={() => setConfirmSettle(false)}
-                  className="py-2 px-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold"
+                  className="btn-secondary py-2 text-xs"
                 >
                   Cancel
                 </button>
               </div>
             </div>
           ) : (
-            <div className="flex gap-2 pt-1">
-              <button
-                onClick={onAddExpenseClick}
-                className="flex-1 py-2.5 px-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-slate-300 text-slate-800 dark:text-slate-200 font-semibold text-xs rounded-xl transition flex items-center justify-center gap-1.5 shadow-sm"
-              >
-                <Plus className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                Add Expense
-              </button>
-
-              <button
-                onClick={() => setConfirmSettle(true)}
-                className="flex-1 py-2.5 px-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-xl transition flex items-center justify-center gap-1.5 shadow-md shadow-indigo-600/20"
-              >
-                <Sparkles className="w-3.5 h-3.5" />
-                {remainingDifference > 0 ? "Settle to Others" : "Mark as Settled"}
-              </button>
-            </div>
+            <>
+              <div className="flex gap-2">
+                <button onClick={onAddExpenseClick} className="btn-secondary flex-1 text-xs">
+                  <Plus className="w-3.5 h-3.5" />
+                  Add Expense
+                </button>
+                <button onClick={() => setConfirmSettle(true)} className="btn-primary flex-1 text-xs">
+                  {remainingDifference > 0 ? "Settle to Others" : "Mark as Settled"}
+                </button>
+              </div>
+              <p className="text-[11px] text-zinc-400 leading-relaxed">
+                Add what you remember. Settling moves the remaining {formatCurrency(remainingDifference)} to &quot;Others&quot;.
+              </p>
+            </>
           )}
         </div>
       )}
 
       {entry.isSettled && (
-        <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-800 dark:text-emerald-300 text-xs flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-            <span>This day is settled and completely reconciled.</span>
-          </div>
-          <button
-            onClick={onAddExpenseClick}
-            className="text-[11px] font-bold text-emerald-700 dark:text-emerald-300 underline"
-          >
-            + Add more
+        <div className="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400">
+          <span>This day is fully reconciled.</span>
+          <button onClick={onAddExpenseClick} className="btn-ghost">
+            <Plus className="w-3 h-3" />
+            Add more
           </button>
         </div>
       )}

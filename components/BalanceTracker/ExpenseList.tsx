@@ -12,7 +12,6 @@ import {
   HeartPulse, 
   MoreHorizontal, 
   Trash2, 
-  Sparkles, 
   CreditCard, 
   Tag, 
   ChevronRight 
@@ -43,75 +42,66 @@ export default function ExpenseList({
 }: ExpenseListProps) {
   if (expenses.length === 0) {
     return (
-      <div className="text-center py-8 px-4 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
-        <MoreHorizontal className="w-8 h-8 mx-auto text-slate-300 dark:text-slate-700 mb-2" />
-        <p className="text-sm font-medium text-slate-600 dark:text-slate-400">No expenses recorded yet</p>
-        <p className="text-xs text-slate-400 mt-0.5">
-          Add specific expenses to explain the difference, or settle remaining to Others.
+      <div className="text-center py-10 px-6 rounded-2xl border border-dashed border-zinc-200 dark:border-zinc-800">
+        <p className="text-sm font-medium text-zinc-600 dark:text-zinc-300">No expenses yet</p>
+        <p className="text-xs text-zinc-400 mt-1 leading-relaxed">
+          Add expenses to explain the difference, or settle the rest to Others.
         </p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-2">
+    <div className="card p-0 divide-y divide-zinc-100 dark:divide-zinc-800">
       {expenses.map((expense) => {
         const Icon = CATEGORY_ICONS[expense.category] || Tag;
         const categoryMeta = CATEGORIES[expense.category as Category] || {
-          color: "text-indigo-500",
-          bg: "bg-indigo-500/10 border-indigo-500/20",
+          color: "text-zinc-500",
         };
 
         return (
           <div
             key={expense.id}
-            className={`flex items-center justify-between p-3.5 rounded-2xl border transition-all ${
-              expense.isAutoSettled
-                ? "bg-amber-50/60 dark:bg-amber-950/20 border-amber-200 dark:border-amber-900/40"
-                : "bg-white dark:bg-slate-800/80 border-slate-200 dark:border-slate-750 shadow-sm"
-            }`}
+            className="flex items-center justify-between gap-3 px-4 py-3.5"
           >
-            <div className="flex items-center gap-3">
-              <div
-                className={`w-10 h-10 rounded-xl flex items-center justify-center border shrink-0 ${categoryMeta.bg}`}
-              >
-                <Icon className={`w-5 h-5 ${categoryMeta.color}`} />
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0">
+                <Icon className={`w-4 h-4 ${categoryMeta.color}`} />
               </div>
-              <div>
+              <div className="min-w-0">
                 <div className="flex items-center gap-1.5 flex-wrap">
-                  <span className="font-semibold text-slate-900 dark:text-white text-sm">
+                  <span className="font-medium text-zinc-900 dark:text-white text-sm">
                     {expense.category}
                   </span>
                   {expense.subcategory && (
-                    <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-md bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold border border-indigo-500/20">
-                      <ChevronRight className="w-2.5 h-2.5" />
+                    <span className="inline-flex items-center gap-0.5 text-xs text-zinc-400">
+                      <ChevronRight className="w-3 h-3" />
                       {expense.subcategory}
                     </span>
                   )}
                   {expense.isAutoSettled && (
-                    <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[10px] font-bold border border-amber-500/20">
-                      <Sparkles className="w-2.5 h-2.5" />
-                      Auto-Settled
+                    <span className="px-1.5 py-0.5 rounded-md bg-amber-500/10 text-amber-700 dark:text-amber-400 text-[10px] font-medium">
+                      Auto-settled
                     </span>
                   )}
                 </div>
-                <p className="text-xs text-slate-500 dark:text-slate-400 truncate max-w-[160px] sm:max-w-xs">
+                <p className="text-xs text-zinc-400 truncate max-w-[160px] sm:max-w-xs">
                   {expense.description || "Uncategorized item"}
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
-              <span className="text-sm font-bold text-slate-900 dark:text-white">
+            <div className="flex items-center gap-1.5 shrink-0">
+              <span className="amount text-sm font-medium text-zinc-900 dark:text-white">
                 {formatCurrency(expense.amount)}
               </span>
               {!isSettled && (
                 <button
                   onClick={() => onDeleteExpense(expense.id)}
                   title="Remove expense"
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 transition"
+                  className="icon-btn hover:text-rose-500"
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className="w-3.5 h-3.5" />
                 </button>
               )}
             </div>
