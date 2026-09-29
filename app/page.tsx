@@ -12,14 +12,10 @@ import {
   Wallet, 
   ArrowRight, 
   Plus, 
-  Sparkles, 
   CheckCircle2, 
   TrendingDown, 
   Database, 
-  Layers, 
-  Bot, 
   FileText, 
-  Calendar,
   Clock
 } from "lucide-react";
 import { isSupabaseConfigured } from "@/lib/supabase";
@@ -66,210 +62,158 @@ export default function HomePage() {
     <div className="min-h-full">
       <Navbar onOpenAuth={() => setAuthModalOpen(true)} />
 
-      <div className="p-5 space-y-6">
-        {/* Welcome Card */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-600 via-indigo-700 to-purple-800 p-6 text-white shadow-xl shadow-indigo-500/20">
-          <div className="absolute -right-6 -bottom-6 w-32 h-32 rounded-full bg-white/10 blur-2xl pointer-events-none" />
-          <div className="relative z-10">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold uppercase tracking-wider text-indigo-200">
-                {todayDayName}, {todayDate}
-              </span>
-              <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-white/15 backdrop-blur-md">
-                Web Assistant Hub
-              </span>
-            </div>
-            <h1 className="text-xl font-extrabold mt-2 tracking-tight">
-              Hello, {user?.name || "Friend"}! 👋
-            </h1>
-            <p className="text-xs text-indigo-100/90 mt-1 leading-relaxed">
-              Track balances day-by-day, reconcile spending, and settle differences effortlessly.
+      <div className="px-5 pt-4 pb-6 space-y-8">
+        {/* Greeting */}
+        <section className="space-y-5">
+          <div>
+            <p className="eyebrow">
+              {todayDayName}, {todayDate}
             </p>
-
-            <div className="mt-5 flex gap-2.5">
-              <button
-                onClick={() => setEntryModalOpen(true)}
-                className="flex-1 py-2.5 px-4 bg-white hover:bg-slate-50 text-indigo-700 font-bold text-xs rounded-xl shadow-md transition flex items-center justify-center gap-1.5"
-              >
-                <Plus className="w-4 h-4" />
-                Record Balance
-              </button>
-
-              <Link
-                href="/balance-tracker"
-                className="py-2.5 px-4 bg-white/20 hover:bg-white/30 text-white font-semibold text-xs rounded-xl backdrop-blur-md transition flex items-center justify-center gap-1.5"
-              >
-                Open Tracker
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
+            <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-white mt-1.5">
+              Hello, {user?.name || "Friend"}
+            </h1>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1 leading-relaxed">
+              Track balances day by day and settle the difference.
+            </p>
           </div>
-        </div>
+
+          <div className="flex gap-2">
+            <button onClick={() => setEntryModalOpen(true)} className="btn-primary flex-1">
+              <Plus className="w-4 h-4" />
+              Record Balance
+            </button>
+            <Link href="/balance-tracker" className="btn-secondary">
+              Open Tracker
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </section>
 
         {/* Latest Balance Quick Widget */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm space-y-4">
+        <section className="card space-y-5">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
-                <Wallet className="w-4 h-4" />
-              </div>
-              <h2 className="font-bold text-slate-900 dark:text-white text-sm">
-                Latest Balance Status
-              </h2>
-            </div>
-            <Link
-              href="/balance-tracker"
-              className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-0.5"
-            >
-              View details <ArrowRight className="w-3 h-3" />
+            <h2 className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
+              Latest balance
+            </h2>
+            <Link href="/balance-tracker" className="btn-ghost">
+              Details <ArrowRight className="w-3 h-3" />
             </Link>
           </div>
 
           {latestEntry ? (
-            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-850 space-y-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <span className="text-[11px] text-slate-500">
-                    Recorded for {latestEntry.dayName} ({latestEntry.date})
-                  </span>
-                  <div className="text-2xl font-extrabold text-slate-900 dark:text-white mt-0.5">
-                    {formatCurrency(latestEntry.balance)}
-                  </div>
+            <div className="space-y-5">
+              <div>
+                <div className="amount text-3xl font-semibold text-zinc-900 dark:text-white">
+                  {formatCurrency(latestEntry.balance)}
                 </div>
-                <div className="text-right">
-                  <span className="text-[11px] text-slate-500">
-                    {daysDiff > 1 ? `Difference (${daysDiff} days)` : "Day Difference"}
-                  </span>
-                  <div className="flex items-center justify-end gap-1 text-sm font-bold text-rose-500 mt-0.5">
+                <p className="text-xs text-zinc-400 mt-1">
+                  {latestEntry.dayName}, {latestEntry.date}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 pt-4 border-t border-zinc-100 dark:border-zinc-800">
+                <div>
+                  <p className="eyebrow">
+                    {daysDiff > 1 ? `Spent · ${daysDiff} days` : "Spent"}
+                  </p>
+                  <p className="amount mt-1 text-base font-medium text-rose-600 dark:text-rose-400 flex items-center gap-1">
                     <TrendingDown className="w-4 h-4" />
                     {formatCurrency(Math.abs(latestEntry.difference))}
-                  </div>
-                  {latestEntry.difference !== 0 && (
-                    <div className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 mt-0.5">
-                      {formatCurrency(perDaySpend)}
-                      <span className="text-[10px] text-slate-400 font-normal"> / day</span>
-                    </div>
+                  </p>
+                </div>
+                <div>
+                  <p className="eyebrow">Per day</p>
+                  <p className="amount mt-1 text-base font-medium text-zinc-900 dark:text-white">
+                    {latestEntry.difference !== 0 ? formatCurrency(perDaySpend) : "—"}
+                  </p>
+                  {previousEntry && (
+                    <p className="text-[11px] text-zinc-400 mt-0.5 flex items-center gap-1">
+                      <Clock className="w-3 h-3" />
+                      {previousEntry.dayName.slice(0, 3)} → {latestEntry.dayName.slice(0, 3)}
+                    </p>
                   )}
                 </div>
               </div>
 
-              {previousEntry && (
-                <div className="flex items-center justify-between px-3 py-1.5 rounded-xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/40 text-xs">
-                  <span className="text-slate-600 dark:text-slate-400 text-[11px] flex items-center gap-1.5 font-medium">
-                    <Clock className="w-3.5 h-3.5 text-indigo-500" />
-                    <span>{daysDiff} {daysDiff === 1 ? "day gap" : "days interval"} ({previousEntry.dayName.slice(0, 3)} → {latestEntry.dayName.slice(0, 3)})</span>
-                  </span>
-                  <span className="font-bold text-indigo-600 dark:text-indigo-400 text-[11px]">
-                    {formatCurrency(perDaySpend)} / day frequency
-                  </span>
-                </div>
-              )}
-
-              <div className="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-slate-750 text-xs">
-                <span className="text-slate-500">Status</span>
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-zinc-400">Status</span>
                 {latestEntry.isSettled ? (
-                  <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-semibold">
+                  <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-medium">
                     <CheckCircle2 className="w-3.5 h-3.5" /> Settled
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1 text-amber-600 dark:text-amber-400 font-semibold">
-                    <Sparkles className="w-3.5 h-3.5" /> Needs Settlement
+                  <span className="inline-flex items-center gap-1.5 text-amber-600 dark:text-amber-400 font-medium">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500" /> Needs settlement
                   </span>
                 )}
               </div>
             </div>
           ) : (
-            <div className="text-center py-6 text-slate-500 text-xs space-y-2">
-              <p>No balances recorded yet.</p>
+            <div className="text-center py-6 space-y-2">
+              <p className="text-sm text-zinc-500">No balances recorded yet.</p>
               <button
                 onClick={() => setEntryModalOpen(true)}
-                className="text-xs text-indigo-600 dark:text-indigo-400 font-bold hover:underline"
+                className="text-sm font-medium text-zinc-900 dark:text-white underline underline-offset-4 decoration-zinc-300 dark:decoration-zinc-600"
               >
-                + Add your first balance (e.g. Sunday balance)
+                Add your first balance
               </button>
             </div>
           )}
-        </div>
+        </section>
 
-        {/* Installed Assistant Apps Grid */}
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <h3 className="font-bold text-slate-900 dark:text-white text-sm">
-              Assistant Apps
-            </h3>
-            <span className="text-[11px] text-slate-400 font-medium">Modular System</span>
-          </div>
+        {/* Installed Assistant Apps */}
+        <section className="space-y-3">
+          <h3 className="eyebrow px-1">Apps</h3>
 
-          <div className="grid grid-cols-1 gap-3">
-            {/* Balance Tracker App */}
+          <div className="card p-0 divide-y divide-zinc-100 dark:divide-zinc-800">
             <Link
               href="/balance-tracker"
-              className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-indigo-400 dark:hover:border-indigo-600 transition shadow-sm flex items-center justify-between group"
+              className="p-4 flex items-center gap-3.5 group"
             >
-              <div className="flex items-center gap-3.5">
-                <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition">
-                  <Wallet className="w-6 h-6" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h4 className="font-bold text-slate-900 dark:text-white text-sm">
-                      Balance Tracker
-                    </h4>
-                    <span className="px-1.5 py-0.5 rounded-md bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold">
-                      Active
-                    </span>
-                  </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1">
-                    Sunday to Monday balance subtraction, expenses, and auto-settle to Others.
-                  </p>
-                </div>
+              <div className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 flex items-center justify-center shrink-0">
+                <Wallet className="w-5 h-5" />
               </div>
-              <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-indigo-600 group-hover:translate-x-0.5 transition shrink-0 ml-2" />
+              <div className="flex-1 min-w-0">
+                <h4 className="font-medium text-zinc-900 dark:text-white text-sm">
+                  Balance Tracker
+                </h4>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 truncate">
+                  Daily balance difference, expenses and auto-settle to Others.
+                </p>
+              </div>
+              <ArrowRight className="w-4 h-4 text-zinc-300 dark:text-zinc-600 group-hover:text-zinc-900 dark:group-hover:text-white group-hover:translate-x-0.5 transition shrink-0" />
             </Link>
 
-            {/* Extensible Future App Slot 1 */}
-            <div className="p-4 rounded-3xl bg-white/60 dark:bg-slate-900/60 border border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-between opacity-70">
-              <div className="flex items-center gap-3.5">
-                <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center shrink-0">
-                  <FileText className="w-6 h-6" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h4 className="font-bold text-slate-700 dark:text-slate-300 text-sm">
-                      Smart Notes & Tasks
-                    </h4>
-                    <span className="px-1.5 py-0.5 rounded-md bg-slate-200 dark:bg-slate-800 text-slate-500 text-[10px] font-semibold">
-                      Coming Next
-                    </span>
-                  </div>
-                  <p className="text-xs text-slate-400 mt-0.5">
-                    Quick scratchpad and daily task checklist for Web Assistant.
-                  </p>
-                </div>
+            <div className="p-4 flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 text-zinc-300 dark:text-zinc-600 flex items-center justify-center shrink-0">
+                <FileText className="w-5 h-5" />
               </div>
+              <div className="flex-1 min-w-0">
+                <h4 className="font-medium text-zinc-400 dark:text-zinc-500 text-sm">
+                  Smart Notes & Tasks
+                </h4>
+                <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-0.5 truncate">
+                  Quick scratchpad and daily task checklist.
+                </p>
+              </div>
+              <span className="text-[10px] font-medium text-zinc-400 shrink-0">Soon</span>
             </div>
           </div>
-        </div>
+        </section>
 
-        {/* Database & Vercel Info Card */}
-        <div className="p-4 rounded-3xl bg-gradient-to-tr from-slate-900 to-indigo-950 text-white shadow-lg space-y-3">
-          <div className="flex items-center gap-2">
-            <Database className="w-4 h-4 text-indigo-400" />
-            <h4 className="font-bold text-xs uppercase tracking-wider text-indigo-300">
-              Database & Vercel Deployment
-            </h4>
-          </div>
-          <p className="text-xs text-slate-300 leading-relaxed">
-            Connected via <strong>{isSupabaseConfigured ? "Supabase Cloud Database" : "Local Storage Demo"}</strong>. 
-            Supabase is 100% free with 50k users and PostgreSQL. Ready for 1-click deployment on Vercel via GitHub!
-          </p>
-          <Link
-            href="/settings"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-300 hover:text-white transition underline"
-          >
-            Database Settings & SQL Schema <ArrowRight className="w-3 h-3" />
-          </Link>
-        </div>
+        {/* Database Info */}
+        <Link
+          href="/settings"
+          className="flex items-center justify-between px-1 text-xs text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors"
+        >
+          <span className="flex items-center gap-1.5">
+            <Database className="w-3.5 h-3.5" />
+            {isSupabaseConfigured ? "Connected to Supabase Cloud" : "Using Local Storage Demo"}
+          </span>
+          <span className="flex items-center gap-1">
+            Database settings <ArrowRight className="w-3 h-3" />
+          </span>
+        </Link>
       </div>
 
       {/* Modals */}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { X, Lock, Mail, Sparkles, CheckCircle2, AlertCircle, ArrowRight, ShieldCheck } from "lucide-react";
+import { X, Lock, Mail, CheckCircle2, AlertCircle, ArrowRight } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 
 interface AuthModalProps {
@@ -94,68 +94,56 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl">
-        <div className="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
-              <Lock className="w-4 h-4" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-slate-900 dark:text-white text-sm">
-                {isSignUp ? "Create an Account" : "Welcome Back"}
-              </h3>
-              <p className="text-xs text-slate-500">
-                {isSupabaseConfigured ? "Powered by Supabase Free Tier" : "Demo / Local Mode"}
-              </p>
-            </div>
+    <div className="modal-backdrop">
+      <div className="modal">
+        <div className="px-6 pt-6 pb-2 flex items-start justify-between">
+          <div>
+            <h3 className="font-semibold text-zinc-900 dark:text-white text-lg tracking-tight">
+              {isSignUp ? "Create an Account" : "Welcome Back"}
+            </h3>
+            <p className="text-sm text-zinc-500 mt-0.5">
+              {isSupabaseConfigured ? "Powered by Supabase" : "Demo / Local Mode"}
+            </p>
           </div>
-          <button
-            onClick={onClose}
-            className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
-          >
-            <X className="w-4 h-4" />
+          <button onClick={onClose} className="icon-btn -mr-1.5">
+            <X className="w-5 h-5" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-5 space-y-4">
+        <form onSubmit={handleSubmit} className="px-6 pt-4 pb-6 space-y-4">
           {errorMessage && (
-            <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 text-xs flex items-start gap-2">
-              <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
+            <div className="p-3 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 text-xs flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 mt-px shrink-0" />
               <span>{errorMessage}</span>
             </div>
           )}
 
           {successMessage && (
-            <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs flex items-center gap-2">
+            <div className="p-3 rounded-xl bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-xs flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 shrink-0" />
               <span>{successMessage}</span>
             </div>
           )}
 
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
-              Email Address
-            </label>
+            <label className="field-label">Email</label>
             <div className="relative">
-              <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+              <Mail className="w-4 h-4 text-zinc-400 absolute left-3.5 top-3 pointer-events-none" />
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
-                className="w-full pl-9 pr-3 py-2 text-sm bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white"
+                className="input pl-10"
               />
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
-              Password
-            </label>
+            <label className="field-label">Password</label>
             <div className="relative">
-              <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+              <Lock className="w-4 h-4 text-zinc-400 absolute left-3.5 top-3 pointer-events-none" />
               <input
                 type="password"
                 required
@@ -163,7 +151,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full pl-9 pr-3 py-2 text-sm bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white"
+                className="input pl-10"
               />
             </div>
           </div>
@@ -171,7 +159,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/20 disabled:opacity-50"
+            className="btn-primary w-full py-3 mt-1"
           >
             {loading ? "Processing..." : isSignUp ? "Sign Up" : "Sign In"}
             <ArrowRight className="w-4 h-4" />
@@ -181,7 +169,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
             <button
               type="button"
               onClick={() => handleOAuthLogin("google")}
-              className="w-full py-2.5 px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-750 text-slate-700 dark:text-slate-200 font-medium text-sm rounded-xl transition flex items-center justify-center gap-2"
+              className="btn w-full py-3 ring-1 ring-inset ring-zinc-200 text-zinc-700 hover:bg-zinc-50 dark:ring-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800"
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24">
                 <path
@@ -205,24 +193,14 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
             </button>
           )}
 
-          <div className="pt-2 text-center">
+          <div className="pt-1 text-center">
             <button
               type="button"
               onClick={() => setIsSignUp(!isSignUp)}
-              className="text-xs text-indigo-600 dark:text-indigo-400 font-medium hover:underline"
+              className="btn-ghost"
             >
-              {isSignUp ? "Already have an account? Sign In" : "Need an account? Sign Up Free"}
+              {isSignUp ? "Already have an account? Sign In" : "Need an account? Sign Up"}
             </button>
-          </div>
-
-          <div className="p-3 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-100 dark:border-slate-800 text-[11px] text-slate-500 space-y-1">
-            <div className="flex items-center gap-1.5 font-medium text-slate-700 dark:text-slate-300">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-              <span>Is Supabase Free?</span>
-            </div>
-            <p>
-              Yes! Supabase includes 50,000 monthly active users and Row-Level Security on its 100% free plan.
-            </p>
           </div>
         </form>
       </div>

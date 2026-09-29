@@ -9,15 +9,10 @@ import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import { UserProfile } from "@/lib/types";
 import { 
   ArrowLeft, 
-  Database, 
-  CheckCircle2, 
-  AlertCircle, 
   Copy, 
   Check, 
   ExternalLink, 
   ShieldCheck, 
-  Server, 
-  Github, 
   Trash2, 
   User, 
   LogOut 
@@ -94,158 +89,137 @@ export default function SettingsPage() {
     <div className="min-h-full">
       <Navbar onOpenAuth={() => setAuthModalOpen(true)} />
 
-      <div className="p-4 sm:p-5 space-y-6">
-        <div className="flex items-center gap-2.5">
-          <Link
-            href="/"
-            className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition"
-          >
+      <div className="px-5 pt-4 pb-6 space-y-8">
+        <div className="flex items-center gap-2">
+          <Link href="/" className="icon-btn -ml-1.5">
             <ArrowLeft className="w-4 h-4" />
           </Link>
           <div>
-            <h1 className="font-extrabold text-slate-900 dark:text-white text-lg tracking-tight">
-              Settings & Database
+            <h1 className="font-semibold text-zinc-900 dark:text-white text-xl tracking-tight">
+              Settings
             </h1>
-            <p className="text-[11px] text-slate-500 font-medium">
-              Supabase Configuration & Vercel Deployment
+            <p className="text-xs text-zinc-400">
+              Account, database and deployment
             </p>
           </div>
         </div>
 
         {/* User Account Section */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <User className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-              <h2 className="font-bold text-slate-900 dark:text-white text-sm">
-                Account Status
-              </h2>
+        <section className="space-y-3">
+          <h2 className="eyebrow px-1">Account</h2>
+          <div className="card flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-500 shrink-0">
+                <User className="w-4 h-4" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-zinc-900 dark:text-white truncate">
+                  {user ? user.name || user.email : "Guest / Local Demo Mode"}
+                </p>
+                <p className="text-xs text-zinc-400 truncate flex items-center gap-1.5">
+                  <span
+                    className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                      isSupabaseConfigured ? "bg-emerald-500" : "bg-amber-500"
+                    }`}
+                  />
+                  {user ? user.email : "Data stored locally in browser storage"}
+                </p>
+              </div>
             </div>
             {user ? (
-              <button
-                onClick={handleSignOut}
-                className="text-xs text-rose-500 hover:underline flex items-center gap-1 font-semibold"
-              >
+              <button onClick={handleSignOut} className="btn-ghost hover:text-rose-500 shrink-0">
                 <LogOut className="w-3.5 h-3.5" /> Sign Out
               </button>
             ) : (
-              <button
-                onClick={() => setAuthModalOpen(true)}
-                className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline font-bold"
-              >
-                Sign In / Up
+              <button onClick={() => setAuthModalOpen(true)} className="btn-primary px-3 py-1.5 text-xs shrink-0">
+                Sign In
               </button>
             )}
           </div>
-
-          <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-800 text-xs flex items-center justify-between">
-            <div>
-              <p className="font-bold text-slate-800 dark:text-slate-200">
-                {user ? user.name || user.email : "Guest / Local Demo Mode"}
-              </p>
-              <p className="text-slate-500 text-[11px]">
-                {user ? user.email : "Data stored locally in browser storage"}
-              </p>
-            </div>
-            <span
-              className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                isSupabaseConfigured
-                  ? "bg-emerald-500/10 text-emerald-600"
-                  : "bg-amber-500/10 text-amber-600"
-              }`}
-            >
-              {isSupabaseConfigured ? "Supabase Cloud" : "Local Mode"}
-            </span>
-          </div>
-        </div>
+        </section>
 
         {/* Is Supabase Free? Explainer */}
-        <div className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/40 dark:to-purple-950/30 border border-indigo-100 dark:border-indigo-900/60 rounded-3xl p-5 shadow-sm space-y-3">
-          <div className="flex items-center gap-2 text-indigo-900 dark:text-indigo-200">
-            <ShieldCheck className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-            <h2 className="font-bold text-sm">Is Supabase Free?</h2>
+        <section className="space-y-3">
+          <h2 className="eyebrow px-1">Database</h2>
+          <div className="card space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium text-zinc-900 dark:text-white">
+                {isSupabaseConfigured ? "Supabase Cloud" : "Local Mode"}
+              </span>
+              <span className="flex items-center gap-1 text-xs text-zinc-400">
+                <ShieldCheck className="w-3.5 h-3.5" /> Free tier
+              </span>
+            </div>
+            <ul className="text-xs text-zinc-500 dark:text-zinc-400 space-y-1.5 leading-relaxed">
+              <li>50,000 monthly active users for authentication</li>
+              <li>500 MB PostgreSQL database</li>
+              <li>Unlimited API requests</li>
+              <li>Row Level Security so each user only sees their own data</li>
+            </ul>
           </div>
-          <p className="text-xs text-indigo-950/80 dark:text-indigo-200/80 leading-relaxed">
-            <strong>Yes, 100% free!</strong> Supabase offers one of the most generous free tiers in the industry with <strong>no credit card required</strong>:
-          </p>
-          <ul className="text-xs text-indigo-950/80 dark:text-indigo-200/80 space-y-1.5 list-disc pl-4">
-            <li><strong>50,000</strong> monthly active users for Authentication (Google, Email, etc.)</li>
-            <li><strong>500 MB</strong> PostgreSQL database (stores millions of balance entries)</li>
-            <li><strong>Unlimited</strong> API requests</li>
-            <li><strong>Row Level Security (RLS)</strong> so each user only sees their own finances</li>
-          </ul>
-        </div>
+        </section>
 
         {/* Vercel & Supabase Setup Steps */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm space-y-4">
-          <div className="flex items-center gap-2">
-            <Server className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-            <h2 className="font-bold text-slate-900 dark:text-white text-sm">
-              Deploy to Vercel with Supabase
-            </h2>
-          </div>
+        <section className="space-y-3">
+          <h2 className="eyebrow px-1">Deploy to Vercel</h2>
 
-          <div className="space-y-3 text-xs">
-            <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-800">
-              <span className="font-bold text-slate-900 dark:text-white block mb-1">
-                Step 1: Create Free Supabase Project
-              </span>
-              <p className="text-slate-500 mb-2">
-                Visit supabase.com and create a new free project.
-              </p>
-              <a
-                href="https://supabase.com/dashboard"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-1 font-semibold text-indigo-600 dark:text-indigo-400 hover:underline"
-              >
-                Supabase Dashboard <ExternalLink className="w-3 h-3" />
-              </a>
-            </div>
-
-            <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-800">
-              <div className="flex items-center justify-between mb-1">
-                <span className="font-bold text-slate-900 dark:text-white">
-                  Step 2: Run SQL Schema
-                </span>
-                <button
-                  onClick={handleCopySql}
-                  className="inline-flex items-center gap-1 text-[11px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline"
+          <ol className="card p-0 divide-y divide-zinc-100 dark:divide-zinc-800 text-xs">
+            <li className="p-4 flex gap-3">
+              <span className="w-5 h-5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 text-[10px] font-semibold flex items-center justify-center shrink-0">1</span>
+              <div className="space-y-1">
+                <p className="font-medium text-zinc-900 dark:text-white text-sm">Create a Supabase project</p>
+                <p className="text-zinc-500">Visit supabase.com and create a new free project.</p>
+                <a
+                  href="https://supabase.com/dashboard"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="btn-ghost text-zinc-900 dark:text-white pt-1"
                 >
-                  {copied ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3" />}
-                  {copied ? "Copied SQL!" : "Copy SQL"}
-                </button>
+                  Supabase Dashboard <ExternalLink className="w-3 h-3" />
+                </a>
               </div>
-              <p className="text-slate-500">
-                Go to the Supabase SQL Editor and paste the schema to create tables and RLS security rules.
-              </p>
-            </div>
+            </li>
 
-            <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-800">
-              <span className="font-bold text-slate-900 dark:text-white block mb-1">
-                Step 3: Add Vercel Environment Variables
-              </span>
-              <p className="text-slate-500 mb-2">
-                Under your Vercel Project Settings &gt; Environment Variables (or in <code>.env.local</code>):
-              </p>
-              <div className="bg-slate-900 text-slate-200 p-2.5 rounded-xl font-mono text-[10px] space-y-1 overflow-x-auto">
-                <div>NEXT_PUBLIC_SUPABASE_URL=https://xyz.supabase.co</div>
-                <div>NEXT_PUBLIC_SUPABASE_ANON_KEY=ey...</div>
+            <li className="p-4 flex gap-3">
+              <span className="w-5 h-5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 text-[10px] font-semibold flex items-center justify-center shrink-0">2</span>
+              <div className="flex-1 space-y-1">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="font-medium text-zinc-900 dark:text-white text-sm">Run the SQL schema</p>
+                  <button onClick={handleCopySql} className="btn-ghost shrink-0">
+                    {copied ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3" />}
+                    {copied ? "Copied" : "Copy SQL"}
+                  </button>
+                </div>
+                <p className="text-zinc-500">
+                  Paste it into the Supabase SQL Editor to create tables and security rules.
+                </p>
               </div>
-            </div>
-          </div>
-        </div>
+            </li>
+
+            <li className="p-4 flex gap-3">
+              <span className="w-5 h-5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 text-[10px] font-semibold flex items-center justify-center shrink-0">3</span>
+              <div className="flex-1 min-w-0 space-y-2">
+                <p className="font-medium text-zinc-900 dark:text-white text-sm">Add environment variables</p>
+                <p className="text-zinc-500">
+                  In Vercel Project Settings &gt; Environment Variables (or <code>.env.local</code>):
+                </p>
+                <div className="bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 p-3 rounded-lg font-mono text-[10px] space-y-1 overflow-x-auto">
+                  <div>NEXT_PUBLIC_SUPABASE_URL=https://xyz.supabase.co</div>
+                  <div>NEXT_PUBLIC_SUPABASE_ANON_KEY=ey...</div>
+                </div>
+              </div>
+            </li>
+          </ol>
+        </section>
 
         {/* Reset Demo Data Action */}
-        <div className="pt-2">
-          <button
-            onClick={handleResetData}
-            className="w-full py-2.5 px-4 rounded-2xl border border-slate-200 dark:border-slate-800 text-rose-500 hover:bg-rose-500/10 font-medium text-xs transition flex items-center justify-center gap-1.5"
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-            Reset Local Demo Data
-          </button>
-        </div>
+        <button
+          onClick={handleResetData}
+          className="w-full py-2 text-xs font-medium text-zinc-400 hover:text-rose-500 transition-colors flex items-center justify-center gap-1.5"
+        >
+          <Trash2 className="w-3.5 h-3.5" />
+          Reset Local Demo Data
+        </button>
       </div>
 
       <AuthModal

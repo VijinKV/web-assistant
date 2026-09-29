@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Sparkles, Database, ShieldCheck, User as UserIcon, LogOut, CheckCircle2 } from "lucide-react";
+import { Sparkles, User as UserIcon } from "lucide-react";
 import { useState, useEffect } from "react";
 import { dataService } from "@/lib/storage";
 import { isSupabaseConfigured } from "@/lib/supabase";
@@ -21,43 +21,39 @@ export default function Navbar({ onOpenAuth }: NavbarProps) {
   }, []);
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md">
-      <div className="max-w-md mx-auto px-4 h-16 flex items-center justify-between">
+    <header className="sticky top-0 z-40 w-full bg-zinc-50/85 dark:bg-zinc-950/85 backdrop-blur-lg">
+      <div className="max-w-md mx-auto px-5 h-14 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/20">
-            <Sparkles className="w-5 h-5" />
+          <div className="w-7 h-7 rounded-lg bg-zinc-900 dark:bg-white flex items-center justify-center text-white dark:text-zinc-900">
+            <Sparkles className="w-3.5 h-3.5" />
           </div>
-          <div>
-            <div className="flex items-center gap-1.5">
-              <span className="font-bold text-slate-900 dark:text-white text-base tracking-tight">
-                Web Assistant
-              </span>
-            </div>
-            <p className="text-[11px] text-slate-500 font-medium leading-none">
+          <div className="leading-tight">
+            <span className="block font-semibold text-zinc-900 dark:text-white text-sm tracking-tight">
+              Web Assistant
+            </span>
+            <span className="block text-[11px] text-zinc-400">
               {pathname === "/balance-tracker" ? "Balance Tracker" : "All-in-One Tools"}
-            </p>
+            </span>
           </div>
         </Link>
 
         {/* Database Status & User Profile */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <Link
             href="/settings"
             title={isSupabaseConfigured ? "Connected to Supabase Cloud" : "Local Storage Demo Mode"}
-            className={`flex items-center gap-1 text-[11px] font-medium px-2 py-1 rounded-full transition-colors border ${
-              isSupabaseConfigured
-                ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30"
-                : "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30"
-            }`}
+            className="flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1 rounded-full text-zinc-500 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-900 transition-colors"
           >
-            <Database className="w-3 h-3" />
-            <span>{isSupabaseConfigured ? "Supabase" : "Local"}</span>
+            <span
+              className={`w-1.5 h-1.5 rounded-full ${isSupabaseConfigured ? "bg-emerald-500" : "bg-amber-500"}`}
+            />
+            <span>{isSupabaseConfigured ? "Synced" : "Local"}</span>
           </Link>
 
           {onOpenAuth && (
             <button
               onClick={onOpenAuth}
-              className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition"
+              className="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors"
               title={user ? `Signed in as ${user.email}` : "Sign in"}
             >
               <UserIcon className="w-4 h-4" />
