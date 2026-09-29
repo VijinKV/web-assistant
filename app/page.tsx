@@ -5,6 +5,8 @@ import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import AuthModal from "@/components/AuthModal";
 import BalanceEntryModal from "@/components/BalanceTracker/BalanceEntryModal";
+import CheckInCard from "@/components/CheckIn/CheckInCard";
+import { CHECKIN_CHANGED_EVENT } from "@/lib/checkin";
 import { dataService } from "@/lib/storage";
 import { BalanceEntry, UserProfile } from "@/lib/types";
 import { formatCurrency, getTodayDateString, getDayName, calculateDaysBetween, getPerDaySpend } from "@/lib/utils";
@@ -20,7 +22,8 @@ import {
   Bot, 
   FileText, 
   Calendar,
-  Clock
+  Clock,
+  Dumbbell
 } from "lucide-react";
 import { isSupabaseConfigured } from "@/lib/supabase";
 
@@ -49,6 +52,9 @@ export default function HomePage() {
 
   useEffect(() => {
     loadData();
+    // the daily check-in popup can save a balance from any page
+    window.addEventListener(CHECKIN_CHANGED_EVENT, loadData);
+    return () => window.removeEventListener(CHECKIN_CHANGED_EVENT, loadData);
   }, []);
 
   const latestEntry = entries.length > 0 ? entries[0] : null;
@@ -105,6 +111,8 @@ export default function HomePage() {
             </div>
           </div>
         </div>
+
+        <CheckInCard />
 
         {/* Latest Balance Quick Widget */}
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm space-y-4">
@@ -221,6 +229,32 @@ export default function HomePage() {
                   </div>
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1">
                     Sunday to Monday balance subtraction, expenses, and auto-settle to Others.
+                  </p>
+                </div>
+              </div>
+              <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-indigo-600 group-hover:translate-x-0.5 transition shrink-0 ml-2" />
+            </Link>
+
+            {/* Habit Trackers App */}
+            <Link
+              href="/trackers"
+              className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-indigo-400 dark:hover:border-indigo-600 transition shadow-sm flex items-center justify-between group"
+            >
+              <div className="flex items-center gap-3.5">
+                <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition">
+                  <Dumbbell className="w-6 h-6" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h4 className="font-bold text-slate-900 dark:text-white text-sm">
+                      Habits
+                    </h4>
+                    <span className="px-1.5 py-0.5 rounded-md bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold">
+                      Active
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1">
+                    Gym, Coca-Cola, chicken, sugar. Asked daily, streaks tracked.
                   </p>
                 </div>
               </div>

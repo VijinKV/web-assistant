@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import BottomNav from "@/components/BottomNav";
+import CheckInGate from "@/components/CheckIn/CheckInGate";
 
 export const metadata: Metadata = {
   title: "Web Assistant",
@@ -28,6 +29,7 @@ export default function RootLayout({
         <div className="max-w-md mx-auto min-h-screen bg-slate-50 dark:bg-slate-900/90 shadow-2xl relative flex flex-col border-x border-slate-200/60 dark:border-slate-800">
           <main className="flex-1 pb-24">{children}</main>
           <BottomNav />
+          <CheckInGate />
         </div>
       </body>
     </html>

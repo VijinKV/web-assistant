@@ -48,3 +48,25 @@ export interface CategoryInfo {
   color: string;
   bg: string;
 }
+
+export type TrackerKind = "yesno" | "count";
+
+export interface Tracker {
+  id: string;
+  userId: string;
+  name: string; // e.g. "Gym", "Coca-Cola"
+  kind: TrackerKind; // yesno = did it / didn't, count = how many
+  unit: string; // e.g. "cans" (count trackers only)
+  isActive: boolean;
+  createdAt: string;
+}
+
+export interface TrackerLog {
+  id: string;
+  userId: string;
+  trackerId: string;
+  date: string; // YYYY-MM-DD the answer is about
+  value: number; // yesno: 1 = yes, 0 = no; count: the amount
+  skipped: boolean; // true = user chose not to answer; never asked again
+  createdAt: string;
+}

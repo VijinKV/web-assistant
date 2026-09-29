@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Wallet, History, Settings } from "lucide-react";
+import { Home, Wallet, Dumbbell, Settings } from "lucide-react";
 
 export default function BottomNav() {
   const pathname = usePathname();
@@ -19,6 +19,12 @@ export default function BottomNav() {
       href: "/balance-tracker",
       icon: Wallet,
       isActive: pathname.startsWith("/balance-tracker"),
+    },
+    {
+      label: "Habits",
+      href: "/trackers",
+      icon: Dumbbell,
+      isActive: pathname.startsWith("/trackers"),
     },
     {
       label: "Settings & DB",

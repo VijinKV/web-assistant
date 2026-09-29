@@ -58,9 +58,51 @@ CREATE POLICY "Users manage own balances" ON public.balance_entries
 CREATE POLICY "Users manage own expenses" ON public.expenses
     FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);`;
 
+const TRACKERS_SQL = `-- Web Assistant: Habit / daily trackers (gym, Coca-Cola, chicken, sugar, ...)
+-- Run once in the Supabase SQL Editor. Safe to re-run.
+-- user_id is TEXT (not UUID) to match supabase/patch.sql, so guest sessions work.
+
+CREATE TABLE IF NOT EXISTS public.trackers (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id TEXT,
+    name TEXT NOT NULL,
+    kind TEXT NOT NULL DEFAULT 'yesno' CHECK (kind IN ('yesno', 'count')),
+    unit TEXT NOT NULL DEFAULT '',
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS public.tracker_logs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id TEXT,
+    tracker_id UUID REFERENCES public.trackers(id) ON DELETE CASCADE NOT NULL,
+    date DATE NOT NULL,
+    value NUMERIC(12, 2) NOT NULL DEFAULT 0,
+    skipped BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMPTZ DEFAULT now(),
+    UNIQUE (tracker_id, date)
+);
+
+ALTER TABLE public.trackers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.tracker_logs ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Public and user access for trackers" ON public.trackers;
+DROP POLICY IF EXISTS "Public and user access for tracker logs" ON public.tracker_logs;
+
+CREATE POLICY "Public and user access for trackers"
+    ON public.trackers FOR ALL USING (true) WITH CHECK (true);
+
+CREATE POLICY "Public and user access for tracker logs"
+    ON public.tracker_logs FOR ALL USING (true) WITH CHECK (true);
+
+CREATE INDEX IF NOT EXISTS idx_trackers_user ON public.trackers(user_id);
+CREATE INDEX IF NOT EXISTS idx_tracker_logs_user_date ON public.tracker_logs(user_id, date DESC);
+`;
+
 export default function SettingsPage() {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [copied, setCopied] = useState(false);
+  const [copiedTrackers, setCopiedTrackers] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
 
   useEffect(() => {
@@ -71,6 +113,12 @@ export default function SettingsPage() {
     navigator.clipboard.writeText(SUPABASE_SCHEMA_SQL);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleCopyTrackersSql = () => {
+    navigator.clipboard.writeText(TRACKERS_SQL);
+    setCopiedTrackers(true);
+    setTimeout(() => setCopiedTrackers(false), 2000);
   };
 
   const handleSignOut = async () => {
@@ -86,6 +134,9 @@ export default function SettingsPage() {
     if (confirm("Reset all local demo entries and expenses?")) {
       localStorage.removeItem("web_assistant_balances");
       localStorage.removeItem("web_assistant_expenses");
+      localStorage.removeItem("web_assistant_trackers");
+      localStorage.removeItem("web_assistant_tracker_logs");
+      localStorage.removeItem("web_assistant_balance_skips");
       window.location.href = "/";
     }
   };
@@ -218,6 +269,24 @@ export default function SettingsPage() {
               </div>
               <p className="text-slate-500">
                 Go to the Supabase SQL Editor and paste the schema to create tables and RLS security rules.
+              </p>
+            </div>
+
+            <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-800">
+              <div className="flex items-center justify-between mb-1">
+                <span className="font-bold text-slate-900 dark:text-white">
+                  Habits SQL (gym, Coca-Cola, ...)
+                </span>
+                <button
+                  onClick={handleCopyTrackersSql}
+                  className="inline-flex items-center gap-1 text-[11px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline"
+                >
+                  {copiedTrackers ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3" />}
+                  {copiedTrackers ? "Copied SQL!" : "Copy SQL"}
+                </button>
+              </div>
+              <p className="text-slate-500">
+                Run once in the Supabase SQL Editor to enable the Habits check-in. Same as <code>supabase/trackers.sql</code>.
               </p>
             </div>
 

@@ -21,12 +21,21 @@ export function getDayName(dateString: string): string {
   return date.toLocaleDateString("en-US", { weekday: "long" });
 }
 
-export function getTodayDateString(): string {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, "0");
-  const day = String(now.getDate()).padStart(2, "0");
+export function formatDateString(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
+}
+
+export function getTodayDateString(): string {
+  return formatDateString(new Date());
+}
+
+// Shift a YYYY-MM-DD string by whole days (negative = past)
+export function shiftDateString(dateString: string, days: number): string {
+  const [year, month, day] = dateString.split("-").map(Number);
+  return formatDateString(new Date(year, month - 1, day + days));
 }
 
 export function calculateDaysBetween(startDateStr: string, endDateStr: string): number {
